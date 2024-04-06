@@ -1,4 +1,0 @@
-dir
-ls
-dir
-cls
