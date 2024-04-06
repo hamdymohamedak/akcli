@@ -54,12 +54,10 @@ fn main() {
             .expect("Failed to execute process");
 
         // Print the output to the user
-        let name = "AKCLI will give you more ease and speed in dealing with the command line";
         println!(
             "{}{}:{}\n{}",
             RED,
             RESET,
-            name,
             String::from_utf8_lossy(&output.stdout)
         );
 
