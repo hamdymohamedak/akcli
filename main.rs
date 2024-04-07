@@ -1,7 +1,8 @@
 use std::collections::HashSet;
 use std::fs::OpenOptions;
 use std::io::{self, Write};
-use std::process::Command;
+use std::process::{Command, Stdio};
+use std::env;
 
 // ANSI escape codes for text colors
 const RED: &str = "\x1b[31m";
@@ -14,18 +15,21 @@ fn main() {
     io::stdin().read_line(&mut terminal_kind).expect("Failed to read line");
     let terminal_kind = terminal_kind.trim(); // Trim newline character
 
-    let mut terminal_value = ""; // Initialize terminal_value with a default value
-    if terminal_kind == "1" {
-        terminal_value = "cmd";
+    let terminal_value = if terminal_kind == "1" {
+        "cmd.exe"
     } else if terminal_kind == "2" {
-        terminal_value = "powershell";
-    }
+        "powershell.exe"
+    } else {
+        panic!("Invalid choice, please enter 1 or 2.");
+    };
 
     println!(
         "{}You can find the GitHub Repo from here https://github.com/hamdymohamedak/akcli{}",
         GREEN, RESET
     );
     println!("");
+
+    let mut current_dir = env::current_dir().unwrap();
 
     let mut executed_commands: HashSet<String> = HashSet::new();
 
@@ -45,6 +49,23 @@ fn main() {
         if trimmed_input == "exit" {
             println!("{}Goodbye!{}", GREEN, RESET);
             break;
+        }
+
+        // Change directory if the input starts with "cd "
+        if trimmed_input.starts_with("cd ") {
+            let new_dir = &trimmed_input[3..].trim();
+            if new_dir.is_empty() {
+                eprintln!("Invalid directory.");
+                continue;
+            }
+            match env::set_current_dir(new_dir) {
+                Ok(_) => {
+                    current_dir = env::current_dir().unwrap();
+                    println!("{}", current_dir.display());
+                }
+                Err(e) => eprintln!("Failed to change directory: {}", e),
+            }
+            continue;
         }
 
         // Execute command with user input
