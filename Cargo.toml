@@ -7,3 +7,4 @@ edition = "2021"
 
 [dependencies]
 rustyline = "8.0"
+fltk = { version = "1.4.28", features = ["fltk-bundled"] }
