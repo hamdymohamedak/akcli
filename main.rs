@@ -29,6 +29,11 @@ fn main() {
     );
     println!("");
 
+    println!("Enter the path for the text file where commands will be saved:");
+    let mut file_path = String::new();
+    io::stdin().read_line(&mut file_path).expect("Failed to read line");
+    let file_path = file_path.trim(); // Trim newline character
+
     let mut current_dir = env::current_dir().unwrap();
 
     let mut executed_commands: HashSet<String> = HashSet::new();
@@ -92,21 +97,21 @@ fn main() {
             );
         }
 
-        // Store command in a text file if it's unique and valid
+        // Store command in the specified text file if it's unique and valid
         if output.status.success() && !executed_commands.contains(&trimmed_input) {
             executed_commands.insert(trimmed_input.clone());
-            if let Err(err) = store_command(&trimmed_input) {
+            if let Err(err) = store_command(&trimmed_input, file_path) {
                 eprintln!("Failed to store command: {}", err);
             }
         }
     }
 }
 
-fn store_command(command: &str) -> io::Result<()> {
+fn store_command(command: &str, file_path: &str) -> io::Result<()> {
     let mut file = OpenOptions::new()
         .append(true)
         .create(true)
-        .open("CommandLine_Storage.txt")?;
+        .open(file_path)?;
     writeln!(file, "{}", command)?;
     Ok(())
 }
